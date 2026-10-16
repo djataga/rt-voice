@@ -18,8 +18,8 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      # GitHub-hosted runners ship the Android SDK with pre-accepted licenses;
+      # Gradle fetches any missing platform/build-tool automatically.
 
       - name: Build debug APK
         run: ./gradlew :app:assembleDebug --stacktrace
