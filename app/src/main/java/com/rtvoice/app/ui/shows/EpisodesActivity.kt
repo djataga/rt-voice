@@ -21,6 +21,10 @@ import com.rtvvoice.app.ui.player.PlayerActivity
 import com.rtvvoice.app.util.Dates
 import kotlinx.coroutines.launch
 
+/** Episode summaries ship as HTML snippets; render them as plain text. */
+private fun plainText(html: String?): String? =
+    html?.trim()?.takeIf { it.isNotBlank() }?.let { org.jsoup.Jsoup.parse(it).text() }
+
 /** All episodes of one show; tapping an episode plays it. */
 class EpisodesActivity : AppCompatActivity() {
 
@@ -97,9 +101,10 @@ private class EpisodesAdapter(
     inner class Holder(private val binding: ItemEpisodeBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(episode: ShowEpisode) {
             binding.title.text = episode.title
-            binding.summary.text = episode.summary?.trim().orEmpty()
+            val summary = plainText(episode.summary)
+            binding.summary.text = summary.orEmpty()
             binding.summary.visibility =
-                if (episode.summary.isNullOrBlank()) View.GONE else View.VISIBLE
+                if (summary.isNullOrBlank()) View.GONE else View.VISIBLE
             binding.time.text = Dates.relative(Dates.parse(episode.time))
             val image = episode.thumbnailUrl ?: episode.image
             binding.image.visibility = if (image.isNullOrBlank()) View.GONE else View.VISIBLE

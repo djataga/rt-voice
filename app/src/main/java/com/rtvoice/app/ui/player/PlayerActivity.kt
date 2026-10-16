@@ -55,16 +55,17 @@ class PlayerActivity : AppCompatActivity() {
                 exo.setMediaItem(MediaItem.fromUri(url))
                 exo.addListener(object : Player.Listener {
                     override fun onPlaybackStateChanged(playbackState: Int) {
-                        binding.status.setText(
-                            when (playbackState) {
-                                Player.STATE_BUFFERING -> R.string.player_buffering
-                                Player.STATE_READY -> R.string.player_ready
-                                Player.STATE_ENDED -> R.string.player_ended
-                                else -> 0
-                            }
-                        )
-                        binding.status.visibility =
-                            if (playbackState == Player.STATE_READY) View.GONE else View.VISIBLE
+                        val message = when (playbackState) {
+                            Player.STATE_BUFFERING -> R.string.player_buffering
+                            Player.STATE_ENDED -> R.string.player_ended
+                            else -> null
+                        }
+                        if (message != null) {
+                            binding.status.setText(message)
+                            binding.status.visibility = View.VISIBLE
+                        } else {
+                            binding.status.visibility = View.GONE
+                        }
                     }
 
                     override fun onPlayerError(error: PlaybackException) {
