@@ -60,25 +60,3 @@ data class EpisodeVideo(
     val size: String? = null,
     @SerializedName("youtube_id") val youtubeId: String? = null,
 )
-
-/** A 24/7 live channel from the `video` endpoint, HLS streams. */
-data class LiveChannel(
-    val id: String,
-    val title: String,
-    val url: String? = null,
-    val schedule: String? = null,
-    val video: Map<String, List<LiveStream>>? = null,
-) {
-    /** Best-effort: highest-bitrate HLS stream, falling back to the bare url. */
-    val hlsUrl: String?
-        get() = video?.get("hls")
-            ?.maxByOrNull { it.bitrate?.toIntOrNull() ?: 0 }
-            ?.url
-            ?: url
-}
-
-data class LiveStream(
-    val url: String? = null,
-    val bitrate: String? = null,
-    val qualityTitle: String? = null,
-)

@@ -36,7 +36,4 @@ interface NewsApi {
 
     @GET("shows/{id}/episodes")
     suspend fun episodes(@Path("id") showId: String): Message<List<ShowEpisode>>
-
-    @GET("video")
-    suspend fun liveChannels(): Message<List<LiveChannel>>
 }

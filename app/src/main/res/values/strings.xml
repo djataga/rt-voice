@@ -52,6 +52,7 @@
     <string name="live_badge">LIVE</string>
     <string name="watch_empty">No live channels available in this edition</string>
     <string name="error_watch">Could not load live channels</string>
+    <string name="watch_choose_source">Watch %1$s via</string>
     <string name="player_error">Could not play this video</string>
     <string name="player_play">Play</string>
     <string name="player_buffering">Buffering…</string>

@@ -47,6 +47,11 @@
             android:name=".ui.bookmarks.BookmarksActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".ui.web.LiveWebActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize" />
+
         <service
             android:name=".service.ReaderService"
             android:exported="false"

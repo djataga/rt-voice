@@ -5,39 +5,31 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.rtvvoice.app.R
-import com.rtvvoice.app.data.api.LiveChannel
+import com.rtvvoice.app.RTVoiceApp
+import com.rtvvoice.app.data.LiveCatalog
+import com.rtvvoice.app.data.LiveChannel
+import com.rtvvoice.app.data.LiveSourceKind
 import com.rtvvoice.app.databinding.FragmentWatchBinding
 import com.rtvvoice.app.databinding.ItemChannelBinding
 import com.rtvvoice.app.ui.player.PlayerActivity
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
+import com.rtvvoice.app.ui.web.LiveWebActivity
 
-/** Watch tab: 24/7 live channels (RT, RTD) streamed over HLS. */
+/**
+ * Watch tab: 24/7 live channels for the current edition. Each channel offers
+ * its sources — HLS plays in the in-app player, site players (Rumble, Odysee,
+ * VK) open in an in-app WebView.
+ */
 class WatchFragment : Fragment() {
 
     private var _binding: FragmentWatchBinding? = null
     private val binding get() = _binding!!
-    private val state = MutableStateFlow<State>(State.Idle)
-    private val adapter = ChannelsAdapter { channel ->
-        channel.hlsUrl?.let { url ->
-            PlayerActivity.start(requireContext(), url, channel.title, image = null, live = true)
-        }
-    }
-
-    sealed class State {
-        data object Idle : State()
-        data object Loading : State()
-        data class Ready(val channels: List<LiveChannel>) : State()
-        data object Error : State()
-    }
+    private val adapter = ChannelsAdapter(::onChannelClicked)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentWatchBinding.inflate(inflater, container, false)
@@ -47,41 +39,32 @@ class WatchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.list.layoutManager = LinearLayoutManager(requireContext())
         binding.list.adapter = adapter
-        binding.retry.setOnClickListener { load() }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                state.collect { render(it) }
-            }
-        }
-        if (state.value is State.Idle) load()
+        val edition = (requireActivity().application as RTVoiceApp).currentEdition()
+        val channels = LiveCatalog.forEdition(edition)
+        adapter.submitList(channels)
+        binding.empty.visibility = if (channels.isEmpty()) View.VISIBLE else View.GONE
     }
 
-    private fun render(value: State) {
-        binding.progress.visibility = if (value is State.Loading) View.VISIBLE else View.GONE
-        when (value) {
-            is State.Ready -> {
-                binding.error.visibility = View.GONE
-                binding.empty.visibility = if (value.channels.isEmpty()) View.VISIBLE else View.GONE
-                adapter.submitList(value.channels)
+    private fun onChannelClicked(channel: LiveChannel) {
+        when (channel.sources.size) {
+            0 -> Unit
+            1 -> open(channel, channel.sources.first())
+            else -> {
+                val labels = channel.sources.map { it.label }.toTypedArray()
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(getString(R.string.watch_choose_source, channel.title))
+                    .setItems(labels) { _, which -> open(channel, channel.sources[which]) }
+                    .show()
             }
-            is State.Error -> {
-                if (adapter.itemCount == 0) binding.error.visibility = View.VISIBLE
-                binding.empty.visibility = View.GONE
-            }
-            else -> Unit
         }
     }
 
-    private fun load() {
-        state.value = State.Loading
-        viewLifecycleOwner.lifecycleScope.launch {
-            state.value = runCatching {
-                com.rtvvoice.app.data.api.NewsRepository.liveChannels()
-            }.fold(
-                { channels -> State.Ready(channels) },
-                { State.Error },
+    private fun open(channel: LiveChannel, source: com.rtvvoice.app.data.LiveSource) {
+        when (source.kind) {
+            LiveSourceKind.HLS -> PlayerActivity.start(
+                requireContext(), source.url, channel.title, image = null, live = true,
             )
+            LiveSourceKind.WEB -> LiveWebActivity.start(requireContext(), source.url, channel.title)
         }
     }
 
@@ -92,7 +75,7 @@ class WatchFragment : Fragment() {
 }
 
 private class ChannelsAdapter(
-    val onPlay: (LiveChannel) -> Unit,
+    val onClick: (LiveChannel) -> Unit,
 ) : ListAdapter<LiveChannel, ChannelsAdapter.Holder>(DIFF) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
@@ -107,7 +90,9 @@ private class ChannelsAdapter(
     inner class Holder(private val binding: ItemChannelBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(channel: LiveChannel) {
             binding.title.text = channel.title
-            binding.root.setOnClickListener { onPlay(channel) }
+            binding.sources.text =
+                channel.sources.joinToString(" · ") { it.label }
+            binding.root.setOnClickListener { onClick(channel) }
         }
     }
 

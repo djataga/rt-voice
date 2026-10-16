@@ -44,6 +44,4 @@ object NewsRepository {
     suspend fun shows(): List<Show> = api.shows().data
 
     suspend fun episodes(showId: String): List<ShowEpisode> = api.episodes(showId).data
-
-    suspend fun liveChannels(): List<LiveChannel> = api.liveChannels().data
 }
