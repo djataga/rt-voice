@@ -6,7 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.rtvvoice.app.RTVoiceApp
-import com.rtvvoice.app.data.Edition
 import com.rtvvoice.app.data.api.Article
 import com.rtvvoice.app.data.api.NewsRepository
 import com.rtvvoice.app.data.api.Section
@@ -15,19 +14,22 @@ import kotlinx.coroutines.launch
 /** Loads the section catalog and per-section article lists. */
 class FeedViewModel(app: Application) : AndroidViewModel(app) {
 
-    private val prefs: com.rtvvoice.app.data.Prefs
-        get() = (getApplication() as RTVoiceApp).prefs
+    private val prefs get() = (getApplication() as RTVoiceApp).prefs
 
     private val _sections = MutableLiveData<Result<List<Section>>>()
     val sections: LiveData<Result<List<Section>>> = _sections
-
-    private val _editionChanged = MutableLiveData<Unit>()
-    val editionChanged: LiveData<Unit> = _editionChanged
 
     private val feedResults = mutableMapOf<String, MutableLiveData<Result<List<Article>>>>()
 
     init {
         NewsRepository.switchEdition(prefs.edition)
+        viewModelScope.launch {
+            // Invalidate cached feeds when the edition changes elsewhere (toolbar spinner).
+            NewsRepository.editionChanges.collect {
+                feedResults.clear()
+                loadSections()
+            }
+        }
     }
 
     fun articlesFor(sectionId: String): LiveData<Result<List<Article>>> =
@@ -56,13 +58,5 @@ class FeedViewModel(app: Application) : AndroidViewModel(app) {
             }
             live.postValue(result)
         }
-    }
-
-    fun selectEdition(edition: Edition) {
-        prefs.edition = edition
-        NewsRepository.switchEdition(edition)
-        feedResults.clear()
-        _editionChanged.value = Unit
-        loadSections()
     }
 }

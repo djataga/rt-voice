@@ -1,8 +1,11 @@
 package com.rtvvoice.app.ui.article
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -11,8 +14,12 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.rtvvoice.app.R
 import com.rtvvoice.app.RTVoiceApp
 import com.rtvvoice.app.data.Edition
@@ -20,21 +27,22 @@ import com.rtvvoice.app.data.api.NewsRepository
 import com.rtvvoice.app.data.db.BookmarksDb
 import com.rtvvoice.app.databinding.ActivityArticleBinding
 import com.rtvvoice.app.tts.ArticleReader
+import com.rtvvoice.app.tts.ReaderManager
 import com.rtvvoice.app.util.ArticleTextExtractor
 import kotlinx.coroutines.launch
 
 /**
  * Article detail screen. Renders the HTML document served by the API in a
  * WebView (same approach as the original app) and offers a voice reader that
- * speaks the extracted plain text paragraph by paragraph.
+ * speaks the extracted plain text paragraph by paragraph — continuing in the
+ * background via [com.rtvvoice.app.service.ReaderService] once started.
  *
  * If the article is bookmarked, its HTML is stored locally, so both reading
  * and listening keep working offline.
  */
-class ArticleActivity : AppCompatActivity(), ArticleReader.Listener {
+class ArticleActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityArticleBinding
-    private lateinit var reader: ArticleReader
     private lateinit var bookmarks: BookmarksDb
 
     private val articleId: String by lazy { intent.getStringExtra(EXTRA_ID) ?: "" }
@@ -48,6 +56,9 @@ class ArticleActivity : AppCompatActivity(), ArticleReader.Listener {
 
     private val currentEdition: Edition
         get() = (application as RTVoiceApp).currentEdition()
+
+    private val notificationPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,16 +74,15 @@ class ArticleActivity : AppCompatActivity(), ArticleReader.Listener {
         val savedRate = (application as RTVoiceApp).prefs.speechRate
         speedIndex = speeds.indexOfFirst { it == savedRate }.takeIf { it >= 0 } ?: 1
 
-        reader = ArticleReader(this, this)
-
         binding.btnSpeed.text = formatSpeed(speeds[speedIndex])
         binding.btnSpeed.setOnClickListener { cycleSpeed() }
         binding.btnPlay.setOnClickListener {
-            if (reader.currentState == ArticleReader.State.IDLE) startReader() else reader.toggle()
+            if (ReaderManager.currentState == ArticleReader.State.IDLE) startReader()
+            else ReaderManager.toggle()
         }
-        binding.btnPrev.setOnClickListener { reader.previousParagraph() }
-        binding.btnNext.setOnClickListener { reader.nextParagraph() }
-        binding.btnStop.setOnClickListener { reader.stop() }
+        binding.btnPrev.setOnClickListener { ReaderManager.previousParagraph() }
+        binding.btnNext.setOnClickListener { ReaderManager.nextParagraph() }
+        binding.btnStop.setOnClickListener { ReaderManager.stop() }
 
         binding.webView.settings.javaScriptEnabled = true
         binding.webView.webViewClient = object : WebViewClient() {
@@ -92,6 +102,19 @@ class ArticleActivity : AppCompatActivity(), ArticleReader.Listener {
 
         binding.refresh.setOnRefreshListener { loadArticle() }
         loadArticle()
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                ReaderManager.status.collect { renderReaderState(it) }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                ReaderManager.errors.collect { message ->
+                    Toast.makeText(this@ArticleActivity, message, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
     }
 
     private fun loadArticle() {
@@ -142,34 +165,45 @@ class ArticleActivity : AppCompatActivity(), ArticleReader.Listener {
             Toast.makeText(this, R.string.reader_no_text, Toast.LENGTH_SHORT).show()
             return
         }
+        maybeRequestNotificationPermission()
+        ReaderManager.start(
+            context = this,
+            text = text,
+            languageTag = loadedEdition?.voiceTag ?: currentEdition.voiceTag,
+            speechRate = speeds[speedIndex],
+            title = articleTitle,
+        )
         binding.readerBar.visibility = View.VISIBLE
-        reader.start(text, loadedEdition?.voiceTag ?: currentEdition.voiceTag, speeds[speedIndex])
     }
 
-    override fun onReaderStateChange(state: ArticleReader.State, paragraphIndex: Int, paragraphCount: Int) {
-        binding.btnPlay.setImageResource(
-            when (state) {
-                ArticleReader.State.PLAYING -> R.drawable.ic_pause
-                else -> R.drawable.ic_play
-            }
-        )
+    private fun maybeRequestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    private fun renderReaderState(status: ReaderManager.Status) {
+        val playing = status.state == ArticleReader.State.PLAYING
+        binding.btnPlay.setImageResource(if (playing) R.drawable.ic_pause else R.drawable.ic_play)
         binding.btnPlay.contentDescription = getString(
-            if (state == ArticleReader.State.PLAYING) R.string.reader_pause else R.string.reader_play
+            if (playing) R.string.reader_pause else R.string.reader_play
         )
-        binding.progressLabel.visibility = if (paragraphCount == 0) View.GONE else View.VISIBLE
+        binding.btnSpeed.text = formatSpeed(status.rate)
+        val showProgress = status.isActive && status.paragraphCount > 0
+        binding.progressLabel.visibility = if (showProgress) View.VISIBLE else View.GONE
         binding.progressLabel.text =
-            if (paragraphCount == 0) "" else getString(R.string.reader_progress, paragraphIndex + 1, paragraphCount)
-    }
-
-    override fun onReaderError(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+            if (showProgress) getString(R.string.reader_progress, status.paragraphIndex + 1, status.paragraphCount)
+            else ""
     }
 
     private fun cycleSpeed() {
         speedIndex = (speedIndex + 1) % speeds.size
         val speed = speeds[speedIndex]
         (application as RTVoiceApp).prefs.speechRate = speed
-        reader.setRate(speed)
+        ReaderManager.setRate(speed)
         binding.btnSpeed.text = formatSpeed(speed)
     }
 
@@ -230,11 +264,6 @@ class ArticleActivity : AppCompatActivity(), ArticleReader.Listener {
             true
         }
         else -> super.onOptionsItemSelected(item)
-    }
-
-    override fun onDestroy() {
-        reader.shutdown()
-        super.onDestroy()
     }
 
     companion object {

@@ -30,4 +30,13 @@ interface NewsApi {
 
     @GET("news/breaking")
     suspend fun breaking(): Message<Breaking>
+
+    @GET("shows")
+    suspend fun shows(): Message<List<Show>>
+
+    @GET("shows/{id}/episodes")
+    suspend fun episodes(@Path("id") showId: String): Message<List<ShowEpisode>>
+
+    @GET("video")
+    suspend fun liveChannels(): Message<List<LiveChannel>>
 }

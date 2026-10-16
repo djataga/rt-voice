@@ -63,4 +63,10 @@ dependencies {
 
     implementation("io.coil-kt:coil:2.7.0")
     implementation("org.jsoup:jsoup:1.18.1")
+
+    implementation("androidx.media:media:1.7.0")
+    val media3 = "1.4.1"
+    implementation("androidx.media3:media3-exoplayer:$media3")
+    implementation("androidx.media3:media3-exoplayer-hls:$media3")
+    implementation("androidx.media3:media3-ui:$media3")
 }

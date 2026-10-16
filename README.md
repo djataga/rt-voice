@@ -20,6 +20,12 @@ last updated 2022) with a **voice reader** that reads articles aloud.
   play / pause, skip paragraph forward/back, paragraph progress (`4 of 12`),
   and speed control (0.75× – 2×). The voice language follows the selected
   edition; audio focus is handled properly.
+- **🎧 Background listening** — playback continues after you leave the app via
+  a foreground media-playback service, with a media notification (play / pause,
+  skip paragraph, stop), lock-screen controls and a persistent session.
+- **📺 Shows** — the full program catalog of each edition; episode lists with
+  direct MP4 playback (media3 / ExoPlayer).
+- **🔴 Live TV** — the 24/7 RT and RTD channels streamed over HLS.
 - **Bookmarks with offline listening** — a bookmark stores the article HTML, so
   saved articles can be read *and* listened to without a connection.
 - **Share**, Material 3 UI, dark-mode aware, RTL support.
@@ -66,16 +72,19 @@ Key endpoints (identical contract on all editions, JSON envelope `{"data": ...}`
 - `GET news/latest` — latest articles
 - `GET news/{section}` — section feed
 - `GET news/latest/{id}/html` — full article HTML
+- `GET shows` + `GET shows/{id}/episodes` — program catalog and episodes
+  (episodes carry direct MP4 `video.url`s)
+- `GET video` — 24/7 live channels with HLS playlists
 
 Article HTML uses stable semantic anchors (`#title`, `.app-mobile__subtitle`,
 `#content`) which the voice reader uses for clean text extraction.
 
 ## Roadmap ideas
 
-- Background playback (foreground service + notification)
+- Media-session integration for the video player (background video)
 - Web-page highlight sync while reading aloud
-- Video stories and shows (`shows`, `videos` endpoints exist in the API)
-- Breaking-news banner (`news/breaking`)
+- Galleries (`media`, galleries endpoints still work)
+- Podcasts (`podcasts`, `soundcloud` endpoints)
 
 ## License
 

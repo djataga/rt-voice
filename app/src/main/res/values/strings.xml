@@ -28,6 +28,35 @@
     <string name="reader_progress">%1$d of %2$d</string>
     <string name="reader_not_loaded">The article has not finished loading yet</string>
     <string name="reader_no_text">No readable text found in this article</string>
+    <string name="reader_channel_name">Voice reader</string>
+    <string name="reader_channel_desc">Shows what the voice reader is currently reading aloud</string>
+    <string name="reader_notification_text">Reading aloud · paragraph %1$d of %2$d</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_news">News</string>
+    <string name="nav_shows">Shows</string>
+    <string name="nav_watch">Watch</string>
+
+    <!-- Shows -->
+    <string name="shows_title">Shows</string>
+    <string name="shows_empty">No shows available in this edition</string>
+    <string name="error_shows">Could not load shows</string>
+
+    <!-- Episodes -->
+    <string name="episodes_title">Episodes</string>
+    <string name="episodes_empty">No episodes available</string>
+    <string name="error_episodes">Could not load episodes</string>
+
+    <!-- Watch -->
+    <string name="watch_title">Watch</string>
+    <string name="live_badge">LIVE</string>
+    <string name="watch_empty">No live channels available in this edition</string>
+    <string name="error_watch">Could not load live channels</string>
+    <string name="player_error">Could not play this video</string>
+    <string name="player_play">Play</string>
+    <string name="player_buffering">Buffering…</string>
+    <string name="player_ready">Ready</string>
+    <string name="player_ended">Playback finished</string>
 
     <!-- Bookmarks -->
     <string name="bookmarks_title">Bookmarks</string>
