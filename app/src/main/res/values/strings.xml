@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RT Voice</string>
+
+    <!-- Main -->
+    <string name="menu_bookmarks">Bookmarks</string>
+    <string name="menu_about">About</string>
+    <string name="error_title">Could not load the news</string>
+    <string name="error_message">Check your connection and try again.</string>
+    <string name="retry">Retry</string>
+    <string name="edition">Edition</string>
+
+    <!-- Article -->
+    <string name="bookmark_add">Add bookmark</string>
+    <string name="bookmark_remove">Remove bookmark</string>
+    <string name="bookmark_added">Saved to bookmarks</string>
+    <string name="bookmark_removed">Removed from bookmarks</string>
+    <string name="share_article">Share article</string>
+    <string name="error_article">Could not load this article</string>
+
+    <!-- Voice reader -->
+    <string name="reader_play">Start voice reader</string>
+    <string name="reader_pause">Pause voice reader</string>
+    <string name="reader_stop">Stop voice reader</string>
+    <string name="reader_next">Next paragraph</string>
+    <string name="reader_prev">Previous paragraph</string>
+    <string name="reader_speed">Reading speed</string>
+    <string name="reader_progress">%1$d of %2$d</string>
+    <string name="reader_not_loaded">The article has not finished loading yet</string>
+    <string name="reader_no_text">No readable text found in this article</string>
+
+    <!-- Bookmarks -->
+    <string name="bookmarks_title">Bookmarks</string>
+    <string name="bookmarks_empty">No saved articles yet.\nUse the star icon inside an article to save it for offline reading and listening.</string>
+    <string name="bookmark_delete">Delete bookmark</string>
+
+    <!-- About -->
+    <string name="about_title">RT Voice</string>
+    <string name="about_message">An open rebuild of the retired RT News reader with an added voice reader that speaks articles aloud.\n\nNot affiliated with or endorsed by RT. News content is delivered by the original RT mobile API; all trademarks belong to their respective owners. Intended for personal use.</string>
+</resources>

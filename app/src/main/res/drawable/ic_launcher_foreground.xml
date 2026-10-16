@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Voice reader motif: white microphone with sound waves on the brand red. -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M45,35c0,-5 4,-9 9,-9s9,4 9,9v16c0,5 -4,9 -9,9s-9,-4 -9,-9z" />
+    <path
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="6"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M33,44 A21,23 0 0 0 75,44" />
+    <path
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="6"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M54,67 L54,76" />
+    <path
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="6"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M40,80 L68,80" />
+    <path
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M36,36 Q30,43 36,50" />
+    <path
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M72,36 Q78,43 72,50" />
+</vector>

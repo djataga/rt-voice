@@ -1,0 +1,23 @@
+# Gradle
+.gradle/
+build/
+app/build/
+
+# IDE
+.idea/
+*.iml
+local.properties
+
+# Reverse-engineering workspace: the original proprietary APK and its
+# decompiled output stay local and are NOT redistributed in this repository.
+OriginApp/
+decompiled/
+tools/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Session tooling artifacts
+.mimosa/
+.kotlin/

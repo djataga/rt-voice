@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="rt_red">#E63946</color>
+    <color name="rt_red_dark">#B02835</color>
+    <color name="brand_black">#111111</color>
+    <color name="surface_dark">#1C1B1F</color>
+    <color name="text_secondary">#615D66</color>
+    <color name="white">#FFFFFF</color>
+    <color name="ic_launcher_background">#E63946</color>
+</resources>

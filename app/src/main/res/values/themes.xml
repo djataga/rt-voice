@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.RTVoice" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/rt_red</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryDark">@color/rt_red_dark</item>
+        <item name="colorSecondary">@color/rt_red</item>
+        <item name="android:statusBarColor">@color/brand_black</item>
+        <item name="toolbarStyle">@style/Widget.RTVoice.Toolbar</item>
+    </style>
+
+    <style name="Widget.RTVoice.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="android:background">@color/brand_black</item>
+        <item name="titleTextColor">@color/white</item>
+        <item name="subtitleTextColor">@color/text_secondary</item>
+        <item name="navigationIconTint">@color/white</item>
+        <item name="popupTheme">@style/ThemeOverlay.RTVoice.Popup</item>
+    </style>
+
+    <style name="ThemeOverlay.RTVoice.Popup" parent="ThemeOverlay.Material3.Light">
+        <item name="colorSurface">@color/white</item>
+    </style>
+
+    <style name="TextAppearance.RTVoice.CardTitle" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="TextAppearance.RTVoice.CardSummary" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:maxLines">3</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+</resources>
