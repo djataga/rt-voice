@@ -2,10 +2,16 @@ package com.rtvvoice.app.ui.player
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -18,11 +24,15 @@ import com.rtvvoice.app.databinding.ActivityPlayerBinding
 /**
  * Full-screen video player for show episodes (MP4) and live channels (HLS).
  * Playback is bound to this activity; audio focus is handled by the player.
+ *
+ * The media3 controller's fullscreen button toggles immersive landscape:
+ * system bars hidden, title block hidden, video filling the screen.
  */
 class PlayerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPlayerBinding
     private var player: ExoPlayer? = null
+    private var isFullscreen = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +43,13 @@ class PlayerActivity : AppCompatActivity() {
         binding.liveBadge.visibility =
             if (intent.getBooleanExtra(EXTRA_LIVE, false)) View.VISIBLE else View.GONE
         binding.status.text = getString(R.string.player_buffering)
+
+        binding.playerView.setFullscreenButtonClickListener { setFullscreen(!isFullscreen) }
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (isFullscreen) setFullscreen(false) else finish()
+            }
+        })
 
         val url = intent.getStringExtra(EXTRA_URL) ?: run { finish(); return }
         initializePlayer(url)
@@ -77,6 +94,30 @@ class PlayerActivity : AppCompatActivity() {
                 exo.prepare()
                 exo.playWhenReady = true
             }
+    }
+
+    private fun setFullscreen(on: Boolean) {
+        if (on == isFullscreen) return
+        isFullscreen = on
+
+        binding.titleBlock.visibility = if (on) View.GONE else View.VISIBLE
+        binding.playerView.layoutParams = binding.playerView.layoutParams.apply {
+            height = if (on) ViewGroup.LayoutParams.MATCH_PARENT else ViewGroup.LayoutParams.WRAP_CONTENT
+        }
+        requestedOrientation = if (on) {
+            ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        } else {
+            ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
+
+        val insets = WindowCompat.getInsetsController(window, window.decorView)
+        if (on) {
+            insets.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            insets.hide(WindowInsetsCompat.Type.systemBars())
+        } else {
+            insets.show(WindowInsetsCompat.Type.systemBars())
+        }
     }
 
     override fun onStop() {
