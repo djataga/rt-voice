@@ -97,6 +97,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
+        // The toolbar is dark; untinted menu icons are near-black and wash out.
+        for (i in 0 until menu.size()) menu.getItem(i).icon?.setTintList(
+            android.content.res.ColorStateList.valueOf(android.graphics.Color.WHITE)
+        )
         return true
     }
 

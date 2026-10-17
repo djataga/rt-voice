@@ -239,6 +239,10 @@ class ArticleActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_article, menu)
+        // The toolbar is dark; untinted menu icons are near-black and wash out.
+        for (i in 0 until menu.size()) menu.getItem(i).icon?.setTintList(
+            android.content.res.ColorStateList.valueOf(android.graphics.Color.WHITE)
+        )
         val item = menu.findItem(R.id.action_bookmark)
         item.setIcon(if (isBookmarked()) R.drawable.ic_star_filled else R.drawable.ic_star_outline)
         item.setTitle(if (isBookmarked()) R.string.bookmark_remove else R.string.bookmark_add)
