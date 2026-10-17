@@ -26,6 +26,13 @@ last updated 2022) with a **voice reader** that reads articles aloud.
 - **📺 Shows** — the full program catalog of each edition; episode lists with
   direct MP4 playback (media3 / ExoPlayer).
 - **🔴 Live TV** — the 24/7 RT and RTD channels streamed over HLS.
+- **📣 Social tab** — RT's official accounts (Telegram, X, Rumble, Odysee,
+  Facebook) plus a native post feed built from RT's public RSS mirrors
+  (per-edition, with sections on the English edition). Posts open in the
+  in-app reader with voice support via the article id embedded in the feed.
+  X and Facebook are opened on their official pages — X is pay-per-use API
+  only and Facebook requires page-admin access (and banned RT in 2024), so
+  there is no free way to read them programmatically.
 - **Bookmarks with offline listening** — a bookmark stores the article HTML, so
   saved articles can be read *and* listened to without a connection.
 - **Share**, Material 3 UI, dark-mode aware, RTL support.

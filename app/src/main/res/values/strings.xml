@@ -36,6 +36,12 @@
     <string name="nav_news">News</string>
     <string name="nav_shows">Shows</string>
     <string name="nav_watch">Watch</string>
+    <string name="nav_social">Social</string>
+
+    <!-- Social -->
+    <string name="social_follow_title">Follow RT</string>
+    <string name="social_error">Could not load the feed</string>
+    <string name="social_note">Posts come from RT\u2019s public RSS mirrors. X and Facebook are opened on their official pages — they no longer allow free apps to read them.</string>
 
     <!-- Shows -->
     <string name="shows_title">Shows</string>

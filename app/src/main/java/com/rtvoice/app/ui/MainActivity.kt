@@ -16,6 +16,7 @@ import com.rtvvoice.app.databinding.ActivityMainBinding
 import com.rtvvoice.app.ui.bookmarks.BookmarksActivity
 import com.rtvvoice.app.ui.news.NewsFragment
 import com.rtvvoice.app.ui.shows.ShowsFragment
+import com.rtvvoice.app.ui.social.SocialFragment
 import com.rtvvoice.app.ui.watch.WatchFragment
 
 /**
@@ -81,6 +82,7 @@ class MainActivity : AppCompatActivity() {
         val fragment: Fragment = when (itemId) {
             R.id.nav_shows -> ShowsFragment()
             R.id.nav_watch -> WatchFragment()
+            R.id.nav_social -> SocialFragment()
             else -> NewsFragment()
         }
         supportFragmentManager.commit {
