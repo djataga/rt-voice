@@ -1,6 +1,8 @@
 package com.rtvvoice.app.ui.social
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -153,7 +155,31 @@ class SocialFragment : Fragment() {
     }
 
     private fun openAccount(account: com.rtvvoice.app.data.SocialAccount) {
+        if (account.name.equals("Telegram", ignoreCase = true)) {
+            openTelegram(account)
+            return
+        }
         LiveWebActivity.start(requireContext(), account.url, account.name)
+    }
+
+    /**
+     * Telegram's t.me web previews render as an interstitial (or not at all)
+     * on some networks, so prefer the installed Telegram app and only fall
+     * back to the in-app browser when it is not available.
+     */
+    private fun openTelegram(account: com.rtvvoice.app.data.SocialAccount) {
+        val appIntent = Intent(Intent.ACTION_VIEW, Uri.parse(account.url))
+            .setPackage("org.telegram.messenger")
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        try {
+            startActivity(appIntent)
+        } catch (_: android.content.ActivityNotFoundException) {
+            LiveWebActivity.start(
+                requireContext(),
+                account.url.replace("t.me/", "t.me/s/"),
+                account.name,
+            )
+        }
     }
 
     private fun openPost(item: RssItem) {

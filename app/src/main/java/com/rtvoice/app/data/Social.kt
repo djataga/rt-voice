@@ -31,10 +31,11 @@ data class RssItem(
 
 object SocialCatalog {
 
-    /** RT's global accounts; opened via LiveWebActivity. Telegram uses the
-     *  public channel preview so posts render without the app. */
+    /** RT's global accounts. Telegram opens the channel in the Telegram app
+     *  when installed (t.me previews are unreliable from some networks);
+     *  the others are opened via LiveWebActivity. */
     val ACCOUNTS: List<SocialAccount> = listOf(
-        SocialAccount("Telegram", "https://t.me/s/RTnews"),
+        SocialAccount("Telegram", "https://t.me/rtnews"),
         SocialAccount("X", "https://x.com/RT_com"),
         SocialAccount("Rumble", "https://rumble.com/c/RTNews"),
         SocialAccount("Odysee", "https://odysee.com/@RT"),
