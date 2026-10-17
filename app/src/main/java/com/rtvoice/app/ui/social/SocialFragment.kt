@@ -154,31 +154,33 @@ class SocialFragment : Fragment() {
         }
     }
 
+    /** Platforms with an official Android app: prefer the app over the site. */
+    private val APP_PACKAGES = mapOf(
+        "telegram" to "org.telegram.messenger",
+        "vk" to "com.vtostudio.lite",
+    )
+
     private fun openAccount(account: com.rtvvoice.app.data.SocialAccount) {
-        if (account.name.equals("Telegram", ignoreCase = true)) {
-            openTelegram(account)
-            return
-        }
+        val appPackage = APP_PACKAGES[account.name.lowercase()]
+        if (appPackage != null && openInApp(account.url, appPackage)) return
         LiveWebActivity.start(requireContext(), account.url, account.name)
     }
 
     /**
-     * Telegram's t.me web previews render as an interstitial (or not at all)
-     * on some networks, so prefer the installed Telegram app and only fall
-     * back to the in-app browser when it is not available.
+     * t.me previews render as an interstitial (or not at all) on some
+     * networks, and VK's own app gives the full community experience — so
+     * for these platforms try the installed app first; if absent (or the
+     * link fails) fall back to the in-app browser.
      */
-    private fun openTelegram(account: com.rtvvoice.app.data.SocialAccount) {
-        val appIntent = Intent(Intent.ACTION_VIEW, Uri.parse(account.url))
-            .setPackage("org.telegram.messenger")
+    private fun openInApp(url: String, appPackage: String): Boolean {
+        val appIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            .setPackage(appPackage)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        try {
+        return try {
             startActivity(appIntent)
+            true
         } catch (_: android.content.ActivityNotFoundException) {
-            LiveWebActivity.start(
-                requireContext(),
-                account.url.replace("t.me/", "t.me/s/"),
-                account.name,
-            )
+            false
         }
     }
 
