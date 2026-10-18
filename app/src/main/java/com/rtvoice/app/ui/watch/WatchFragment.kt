@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -17,6 +19,7 @@ import com.rtvvoice.app.data.LiveChannel
 import com.rtvvoice.app.data.LiveSourceKind
 import com.rtvvoice.app.databinding.FragmentWatchBinding
 import com.rtvvoice.app.databinding.ItemChannelBinding
+import kotlinx.coroutines.launch
 import com.rtvvoice.app.ui.player.PlayerActivity
 import com.rtvvoice.app.ui.web.LiveWebActivity
 
@@ -64,7 +67,28 @@ class WatchFragment : Fragment() {
             LiveSourceKind.HLS -> PlayerActivity.start(
                 requireContext(), source.url, channel.title, image = null, live = true,
             )
+            LiveSourceKind.RUMBLE -> openRumble(channel, source)
             LiveSourceKind.WEB -> LiveWebActivity.start(requireContext(), source.url, channel.title)
+        }
+    }
+
+    /**
+     * Rumble embeds carry the direct HLS playlist; resolve it and play in the
+     * native player. If resolution fails (network, layout change), fall back
+     * to the web page.
+     */
+    private fun openRumble(channel: LiveChannel, source: com.rtvvoice.app.data.LiveSource) {
+        Toast.makeText(requireContext(), R.string.watch_resolving_rumble, Toast.LENGTH_SHORT).show()
+        viewLifecycleOwner.lifecycleScope.launch {
+            val streamUrl = runCatching {
+                com.rtvvoice.app.util.RumbleResolver.resolveLiveStream(source.url)
+            }.getOrNull()
+            if (streamUrl != null) {
+                PlayerActivity.start(requireContext(), streamUrl, channel.title, image = null, live = true)
+            } else {
+                Toast.makeText(requireContext(), R.string.watch_rumble_fallback, Toast.LENGTH_LONG).show()
+                LiveWebActivity.start(requireContext(), source.url, channel.title)
+            }
         }
     }
 

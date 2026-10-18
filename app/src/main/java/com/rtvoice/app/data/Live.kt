@@ -16,7 +16,7 @@ package com.rtvvoice.app.data
  * Note: the *.rttv.com CDN resolves IPv6-only; on networks without IPv6 only
  * the web players work.
  */
-enum class LiveSourceKind { HLS, WEB }
+enum class LiveSourceKind { HLS, WEB, RUMBLE }
 
 data class LiveSource(
     val label: String,
@@ -39,8 +39,8 @@ object LiveCatalog {
         title = "RT News",
         sources = listOf(
             LiveSource("App player", "https://rt-glb.rttv.com/dvr/rtnews/playlist.m3u8", LiveSourceKind.HLS),
+            LiveSource("Rumble", "https://rumble.com/embed/v33aw1a/", LiveSourceKind.RUMBLE),
             LiveSource("Website player", "https://rt-english.com/on-air/", LiveSourceKind.WEB),
-            LiveSource("Rumble", "https://rt-english.com/on-air/rumble/", LiveSourceKind.WEB),
             LiveSource("Odysee", "https://rt-english.com/on-air/odysee/", LiveSourceKind.WEB),
         ),
     )

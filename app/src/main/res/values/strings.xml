@@ -59,6 +59,8 @@
     <string name="watch_empty">No live channels available in this edition</string>
     <string name="error_watch">Could not load live channels</string>
     <string name="watch_choose_source">Watch %1$s via</string>
+    <string name="watch_resolving_rumble">Resolving Rumble stream…</string>
+    <string name="watch_rumble_fallback">Could not resolve the Rumble stream — opening the page instead</string>
     <string name="player_error">Could not play this video</string>
     <string name="player_play">Play</string>
     <string name="player_buffering">Buffering…</string>
