@@ -21,3 +21,8 @@ Thumbs.db
 # Session tooling artifacts
 .mimosa/
 .kotlin/
+
+# Release signing (never commit keys or credentials)
+*.jks
+*.keystore
+keystore.properties
