@@ -101,6 +101,7 @@ class ArticleActivity : AppCompatActivity() {
         }
 
         binding.refresh.setOnRefreshListener { loadArticle() }
+        binding.refresh.isScrolledAwayFromTop = { binding.webView.canScrollVertically(-1) }
         loadArticle()
 
         lifecycleScope.launch {
